@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vespa-cfg
+  labels:
+    app: vespa-cfg
+spec:
+  replicas: 1
+  serviceName: vespa-cfg
+  selector:
+    matchLabels:
+      app: vespa-cfg
+  template:
+    metadata:
+      labels:
+        app: vespa-cfg
+    spec:
+      containers:
+      - name: vespa-cfg
+        image: vespaengine/vespa:8
+        imagePullPolicy: Always
+        # Use this argument to start a pure config service
+        #args: ["configserver"]
+        env:
+        - name: VESPA_CONFIGSERVERS
+          value: vespa-cfg-0.vespa-cfg.default.svc.cluster.local
+        securityContext:
+          runAsUser: 1000
+        ports:
+        - containerPort: 19071
+          protocol: TCP
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 19050
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /state/v1/health
+            port: 19071
+            scheme: HTTP

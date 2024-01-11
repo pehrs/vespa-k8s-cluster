@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vespa-cfg
+  labels:
+    app: vespa-cfg
+spec:
+  selector:
+    app: vespa-cfg
+  type: NodePort
+  ports:
+  - name: container
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: config
+    port: 19071
+    targetPort: 19071
+  - name: configstate
+    port: 19050
+    targetPort: 19050
+    protocol: TCP

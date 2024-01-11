@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+# Vespa content nodes
+metadata:
+  name: vespa-c
+  labels:
+    app: vespa-c
+spec:
+  replicas: 2
+  serviceName: vespa-c
+  selector:
+    matchLabels:
+      app: vespa-c
+  template:
+    metadata:
+      labels:
+        app: vespa-c
+    spec:
+      containers:
+      - name: vespa-c
+        image: vespaengine/vespa:8
+        imagePullPolicy: Always
+        args: ["services"]
+        env:
+        - name: VESPA_CONFIGSERVERS
+          value: vespa-cfg-0.vespa-cfg.default.svc.cluster.local
+        volumeMounts:
+          - name: vespa-var-vol
+            mountPath: /opt/vespa/var
+        resources:
+          requests:
+            memory: "1G"
+          limits:
+            memory: "1G"
+        securityContext:
+          runAsUser: 1000
+        ports:
+        - containerPort: 19092
+          protocol: TCP
+        - containerPort: 19090
+          protocol: TCP
+        - containerPort: 19071
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 19090
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 19090
+          initialDelaySeconds: 15
+          periodSeconds: 10
+  volumeClaimTemplates:
+  - metadata:
+      name: vespa-var-vol
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
