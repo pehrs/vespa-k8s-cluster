@@ -29,7 +29,7 @@ kind create cluster \
 ## Deploy and start the Vespa Cluster
 
 ```shell
-kubectl -f k8s/
+kubectl apply -f k8s/
 ```
 
 ### forward ports needed
